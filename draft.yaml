@@ -1,0 +1,50 @@
+models:
+  # Users of the system
+  # Spatie Laravel Permission package is used for roles and permissions
+
+  # Use team, like sales, marketing, etc
+  Team:
+    name: string:100 required index
+    description: text
+    relationships:
+      hasMany: User
+
+  # Workflow of the Project
+  Issuestatus:
+    name: string:100 required index
+    description: text
+    order: integer required
+    relationships:
+      belongsTo: Project
+      hasMany: Issue, Team, Role
+
+  # Issues in the project
+  Issue:
+    name: string:100 required index
+    description: text
+    assignee: id:User
+    reporter: id:User    
+    priority: enum:low,medium,high required
+    relationships:
+      belongsTo: Project, Issuestatus
+
+  # Badges for the issues
+  Issuebadge:
+    name: string:20 required index
+    relationships:
+      belongsTo: Issue
+
+  # History of the Issue: Comments, status change, etc
+  Issueactivity:
+    type: enum:comment,statuschange required index
+    Relationships:
+      belongsTo: Issue, User
+
+  # Projects (tenant)
+  Project:
+    name: string:100 required index
+    code: string:15 required
+    description: text        
+    relationships:
+      hasMany: Team
+      hasMany: Issue, Issuestatus
