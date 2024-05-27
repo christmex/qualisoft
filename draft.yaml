@@ -9,24 +9,15 @@ models:
     relationships:
       hasMany: User
 
-  # Workflow of the Project
-  Issuestatus:
-    name: string:100 required index
-    description: text
-    order: integer required
-    relationships:
-      belongsTo: Project
-      hasMany: Issue, Team, Role
-
   # Issues in the project
   Issue:
     name: string:100 required index
-    description: text
-    assignee: id:User
-    reporter: id:User    
+    description: text nullable
+    assignee: id foreign:User nullable
+    reporter: id foreign:User nullable
     priority: enum:low,medium,high required
     relationships:
-      belongsTo: Project, Issuestatus
+      belongsTo: Project, Projectstatus
 
   # Badges for the issues
   Issuebadge:
@@ -37,14 +28,26 @@ models:
   # History of the Issue: Comments, status change, etc
   Issueactivity:
     type: enum:comment,statuschange required index
+    comment: string,300 nullable
+    initial_status: string nullable
+    final_status: string nullable
     Relationships:
       belongsTo: Issue, User
 
-  # Projects (tenant)
+  # Projects / Process (tenant)
   Project:
     name: string:100 required index
-    code: string:15 required
+    slug: string:15 required
     description: text        
     relationships:
-      hasMany: Team
-      hasMany: Issue, Issuestatus
+      hasMany: Team, Issue, Projectstatus
+
+  # Workflow of the Project
+  Projectstatus:
+    name: string:100 required index
+    description: text
+    maxtime: datetime # max time an issue can be in this status
+    order: integer required
+    relationships:
+      belongsTo: Project
+      hasMany: Issue, Team # Teams that can work on this status.
